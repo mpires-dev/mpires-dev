@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+.next/
+.claude
+.agent
+.agents
+.opencode
+.env
+skills-lock.json

@@ -1,0 +1,52 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-background: #090909;
+  --color-foreground: #f3f3f3;
+  --color-primary: #ffffff;
+  --color-primary-foreground: #000000;
+  --color-secondary: #101010;
+  --color-secondary-foreground: #ffffff;
+  --color-accent: #000000;
+  --color-accent-foreground: #ffffff;
+  --font-heading: var(--font-display);
+  --font-body: var(--font-display);
+}
+
+:root {
+  --background: #090909;
+  --foreground: #f3f3f3;
+  --font-display: 'Work Sans', sans-serif;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+/* Custom Selection Color */
+::selection {
+  background: #fff;
+  color: #000;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
