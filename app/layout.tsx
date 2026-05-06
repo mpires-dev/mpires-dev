@@ -21,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${workSans.variable}`}>
+    <html lang="en" className={`${workSans.variable} dark`}>
       <body className="antialiased bg-background text-foreground min-h-screen flex flex-col font-body selection:bg-primary selection:text-primary-foreground">
         <Navbar />
         <main className="flex-1 mt-16 px-4 md:px-8 py-12 max-w-7xl mx-auto w-full">

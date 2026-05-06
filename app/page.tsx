@@ -2,9 +2,10 @@ import Link from "next/link";
 import { reader } from "./reader";
 import { ProjectCard } from "./components/ProjectCard";
 import { AiFileCard } from "./components/AiFileCard";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Download } from "lucide-react";
 import Dither from "./components/Dither";
 import { CareerTimeline } from "./components/CareerTimeline";
+
 export default async function Homepage() {
   const projects = await reader.collections.projects.all();
   const aiFiles = await reader.collections.aiFiles.all();
@@ -17,49 +18,18 @@ export default async function Homepage() {
     })
     .slice(0, 4);
 
-  const sideProjects = [
-    {
-      title: "AI SaaS Starter",
-      description:
-        "Production-ready TypeScript starter with auth, billing and AI workflows.",
-      href: "#",
-    },
-    {
-      title: "PromptOps Toolkit",
-      description:
-        "A practical toolkit to version, test, and ship prompts with confidence.",
-      href: "#",
-    },
-    {
-      title: "Conversion-Led Landing System",
-      description:
-        "Reusable landing architecture optimized for speed and conversion.",
-      href: "#",
-    },
-    {
-      title: "Design-to-Code Pipeline",
-      description:
-        "Workflow that turns Figma handoff into scalable React components.",
-      href: "#",
-    },
-  ];
-
-  const awards = [
-    "Top 1 at Startup Weekend Product Challenge (2019)",
-    "Winner at National Hackathon Product Track (2021)",
-    "Silver at Digital Product Excellence Awards (2023)",
-    "Recognized Mentor in AI Product Community (2024)",
-  ];
-
-  const mentorship = [
-    "Speaker at TypeScript Community Meetup",
-    "Guest Mentor for early-stage SaaS founders",
-    "Workshop host: AI features from prototype to production",
-    "Career mentor for junior fullstack developers",
+  const skills = [
+    { category: "Languages", items: ["TypeScript", "JavaScript", "SQL", "Kotlin"] },
+    { category: "Frontend", items: ["React", "Next.js", "Tailwind CSS", "Storybook"] },
+    { category: "Backend", items: ["Node.js", "NestJS", "Express", "REST", "GraphQL"] },
+    { category: "Infrastructure", items: ["Docker", "AWS", "Vercel", "Redis", "Kafka"] },
+    { category: "AI / LLM", items: ["OpenAI SDK", "LangChain", "Prompt Engineering", "RAG"] },
+    { category: "Practices", items: ["TDD", "CI/CD", "Monorepo", "Domain-Driven Design"] },
   ];
 
   return (
     <div className="space-y-20 pb-8">
+      {/* Hero background */}
       <div className="left-0 top-0 opacity-40 w-full h-175 absolute">
         <Dither
           waveColor={[0.5, 0.5, 0.5]}
@@ -71,38 +41,56 @@ export default async function Homepage() {
           waveSpeed={0.04}
         />
       </div>
-      <div className="max-w-3xl flex flex-col justify-center  relative h-150 gap-3">
+
+      {/* Hero */}
+      <div className="max-w-3xl flex flex-col justify-center relative h-150 gap-3">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-xs font-mono text-zinc-500 bg-white/5 px-3 py-1 rounded-full border border-white/10">
+            Available for contracts
+          </span>
+        </div>
         <h1 className="text-3xl font-medium leading-[1.05] tracking-[-0.03em] text-white md:text-5xl z-20">
-          Hi I&apos;m Matheus Pires 👋 <br /> a Fullstack Developer focused on
-          high-growth digital products.
+          Hi, I&apos;m Matheus Pires 👋 <br /> Fullstack Developer focused on
+          AI-powered digital products.
         </h1>
-        <p className="max-w-3xl text-lg leading-relaxed text-zinc-300">
-          With 8 years of experience, I specialize in the TypeScript ecosystem
-          and AI product execution. I partner with teams to ship faster, scale
-          smarter, and build experiences that directly impact revenue.
+        <p className="max-w-2xl text-lg leading-relaxed text-zinc-300">
+          7+ years shipping TypeScript-first products — from food-tech at iFood to cloud infra at Devopness.
+          I specialize in building fast, scalable web products that directly impact revenue.
         </p>
         <div className="flex flex-wrap gap-3 text-sm text-zinc-200">
           <Link
-            href="mailto:hello@example.com"
-            className="rounded-full border border-white/20 px-4 py-2 transition-colors hover:border-white bg-white text-black"
+            href="/contact"
+            className="rounded-full border border-white/20 px-4 py-2 transition-colors hover:border-white bg-white text-black font-medium"
           >
-            Email
+            Get in touch
           </Link>
           <Link
-            href="https://linkedin.com"
+            href="https://linkedin.com/in/matheusfpires"
+            target="_blank"
+            rel="noopener noreferrer"
             className="rounded-full border border-white/20 px-4 py-2 transition-colors hover:border-white"
           >
             LinkedIn
           </Link>
           <Link
-            href="/projects"
+            href="https://github.com/theoxys"
+            target="_blank"
+            rel="noopener noreferrer"
             className="rounded-full border border-white/20 px-4 py-2 transition-colors hover:border-white"
           >
-            Projects
+            GitHub
+          </Link>
+          <Link
+            href="/api/resume"
+            className="rounded-full border border-white/20 px-4 py-2 transition-colors hover:border-white flex items-center gap-2"
+          >
+            <Download size={14} />
+            Resume
           </Link>
         </div>
       </div>
 
+      {/* Case studies */}
       <section className="relative">
         <div className="mb-10 flex items-end justify-between gap-4">
           <h2 className="text-3xl font-heading font-medium tracking-tight md:text-4xl">
@@ -153,6 +141,40 @@ export default async function Homepage() {
         </div>
       </section>
 
+      {/* Skills grid */}
+      <section>
+        <div className="mb-10">
+          <h2 className="text-3xl font-heading font-medium tracking-tight md:text-4xl">
+            Technical{" "}
+            <span className="text-zinc-500">Skills</span>
+          </h2>
+          <p className="mt-2 text-zinc-400">Technologies and practices I use daily.</p>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {skills.map((group) => (
+            <div
+              key={group.category}
+              className="rounded-xl border border-white/10 bg-white/[0.02] p-5"
+            >
+              <h3 className="text-xs font-mono text-zinc-500 uppercase tracking-widest mb-3">
+                {group.category}
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {group.items.map((item) => (
+                  <span
+                    key={item}
+                    className="text-sm text-zinc-300"
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* AI Files */}
       <section className="relative">
         <div className="mb-10 flex items-end justify-between gap-4">
           <div>
@@ -160,7 +182,7 @@ export default async function Homepage() {
               AI Files
             </h2>
             <p className="text-zinc-400 mt-2">
-              Open source AI skills, agents and tools — free to use and remix.
+              Open-source AI skills, agents and prompts — free to use and remix.
             </p>
           </div>
           <Link
@@ -189,12 +211,6 @@ export default async function Homepage() {
           <div className="rounded-2xl border border-dashed border-white/15 py-20 text-center">
             <p className="text-4xl mb-3">🤖</p>
             <p className="text-zinc-400">No AI files published yet.</p>
-            <Link
-              href="/keystatic"
-              className="mt-4 inline-block text-primary hover:underline"
-            >
-              Open content panel
-            </Link>
           </div>
         )}
 
@@ -208,63 +224,8 @@ export default async function Homepage() {
         </div>
       </section>
 
+      {/* Career Timeline */}
       <CareerTimeline />
-
-      <section className="grid gap-8 md:grid-cols-2">
-        <div className="rounded-2xl border border-white/10 bg-[#0b0b0b] p-6">
-          <h3 className="mb-5 text-2xl font-heading font-semibold text-white">
-            Side projects
-          </h3>
-          <div className="space-y-4">
-            {sideProjects.map((project) => (
-              <Link
-                key={project.title}
-                href={project.href}
-                className="block rounded-xl border border-white/10 p-4 transition-colors hover:border-white/25"
-              >
-                <p className="font-medium text-white">{project.title}</p>
-                <p className="mt-1 text-sm text-zinc-400">
-                  {project.description}
-                </p>
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <div className="space-y-8">
-          <div className="rounded-2xl border border-white/10 bg-[#0b0b0b] p-6">
-            <h3 className="mb-4 text-2xl font-heading font-semibold text-white">
-              Awards
-            </h3>
-            <ul className="space-y-3 text-sm text-zinc-300">
-              {awards.map((item) => (
-                <li
-                  key={item}
-                  className="border-b border-white/10 pb-3 last:border-b-0 last:pb-0"
-                >
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="rounded-2xl border border-white/10 bg-[#0b0b0b] p-6">
-            <h3 className="mb-4 text-2xl font-heading font-semibold text-white">
-              Mentorship
-            </h3>
-            <ul className="space-y-3 text-sm text-zinc-300">
-              {mentorship.map((item) => (
-                <li
-                  key={item}
-                  className="border-b border-white/10 pb-3 last:border-b-0 last:pb-0"
-                >
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

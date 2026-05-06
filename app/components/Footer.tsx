@@ -8,9 +8,34 @@ export function Footer() {
           © {new Date().getFullYear()} Matheus Pires. All rights reserved.
         </p>
         <div className="flex space-x-6 text-sm text-gray-400">
-          <Link href="https://github.com" className="hover:text-primary transition-colors">GitHub</Link>
-          <Link href="https://linkedin.com" className="hover:text-primary transition-colors">LinkedIn</Link>
-          <Link href="mailto:hello@example.com" className="hover:text-primary transition-colors">Email</Link>
+          <Link
+            href="https://github.com/theoxys"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-primary transition-colors"
+          >
+            GitHub
+          </Link>
+          <Link
+            href="https://linkedin.com/in/matheusfpires"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-primary transition-colors"
+          >
+            LinkedIn
+          </Link>
+          <Link
+            href="/contact"
+            className="hover:text-primary transition-colors"
+          >
+            Contact
+          </Link>
+          <Link
+            href="/api/resume"
+            className="hover:text-primary transition-colors"
+          >
+            Resume PDF
+          </Link>
         </div>
       </div>
     </footer>
