@@ -1,10 +1,32 @@
 import React from 'react';
 import Markdoc from '@markdoc/markdoc';
+import type { Metadata } from 'next';
 import { reader } from '../../reader';
 import { markdocConfig } from '../../../keystatic.config';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, ExternalLink, Github } from 'lucide-react';
+
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await props.params;
+  const project = await reader.collections.projects.read(slug);
+  if (!project) return {};
+  return {
+    title: `${project.title} — Matheus Pires`,
+    description: project.description ?? undefined,
+    openGraph: {
+      title: project.title,
+      description: project.description ?? undefined,
+      type: "article",
+      images: project.coverImage ? [{ url: project.coverImage }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: project.title,
+      description: project.description ?? undefined,
+    },
+  };
+}
 
 export default async function ProjectPage(props: {
   params: Promise<{ slug: string }>;

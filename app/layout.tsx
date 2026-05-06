@@ -13,8 +13,21 @@ const workSans = Work_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Matheus Pires | Fullstack Developer",
+  metadataBase: new URL("https://mpires.dev"),
+  title: {
+    default: "Matheus Pires | Fullstack Developer",
+    template: "%s — Matheus Pires",
+  },
   description: "Fullstack Developer specialized in TypeScript and AI-first product delivery.",
+  openGraph: {
+    siteName: "Matheus Pires",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    creator: "@matheusfpires",
+  },
 };
 
 export default function RootLayout({

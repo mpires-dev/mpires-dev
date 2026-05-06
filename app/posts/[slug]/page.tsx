@@ -12,17 +12,14 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   if (!post) return {};
   return {
     title: `${post.title} — Matheus Pires`,
-    description: post.summary ?? undefined,
     openGraph: {
       title: post.title,
-      description: post.summary ?? undefined,
       type: "article",
       authors: ["Matheus Pires"],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
-      description: post.summary ?? undefined,
     },
   };
 }
