@@ -1,0 +1,115 @@
+---
+name: API Contract Generator
+description: >
+  Describe what your API needs to do in plain English and get back a complete
+  OpenAPI 3.1 spec with schemas, auth, error codes, and example responses.
+  Generates production-ready contracts you can drop straight into your docs.
+installCommand: npx @redocly/cli lint openapi.yaml
+---
+
+# API Contract Generator
+
+Describe your API in plain English and get back a complete, production-grade OpenAPI 3.1 specification. No YAML wrestling — just describe what you need and get a contract you can actually ship.
+
+## Prompt
+
+```
+You are an API design expert. Generate a complete OpenAPI 3.1 specification from the description below.
+
+API description:
+[DESCRIBE YOUR API HERE — what it does, who calls it, what data flows in and out]
+
+Requirements:
+- Authentication method: [API key / JWT / OAuth2 / none]
+- Expected callers: [internal service / mobile app / third-party developers / etc.]
+- Existing data models to reuse (if any): [list them]
+
+Generate a complete openapi.yaml with:
+
+1. **Info block** — title, version (start at 1.0.0), description, contact, license (MIT)
+
+2. **Servers** — include localhost dev server and a placeholder production URL
+
+3. **Security schemes** — implement the specified auth method fully:
+   - API key: in header (X-API-Key), query param, or cookie
+   - JWT: Bearer token with proper securitySchemes definition
+   - OAuth2: with authorization and token URLs
+
+4. **Paths** — for each endpoint:
+   - Use RESTful URL conventions (plural nouns, nested resources where logical)
+   - Include all CRUD operations that make sense for the resource
+   - Document path parameters, query parameters (filtering, pagination, sorting), and request body
+   - Use $ref to reference shared schemas — never inline complex objects
+   - Include operationId (camelCase, e.g., listUsers, createOrder)
+
+5. **Components/schemas** — define every data model with:
+   - All properties with types, formats, and constraints (minLength, maximum, pattern, enum)
+   - required array listing non-optional fields
+   - description for every property
+   - example values that are realistic (not "string" or 123)
+
+6. **Response definitions** — for every endpoint document:
+   - 200/201 success response with schema
+   - 400 Bad Request (validation errors)
+   - 401 Unauthorized (if auth is required)
+   - 404 Not Found (for resource endpoints)
+   - 422 Unprocessable Entity (business logic errors)
+   - 500 Internal Server Error
+   Use a consistent error schema across all 4xx/5xx responses:
+   ```yaml
+   Error:
+     type: object
+     required: [code, message]
+     properties:
+       code: { type: string }
+       message: { type: string }
+       details: { type: object }
+   ```
+
+7. **Pagination** — if any endpoint returns a list, use cursor-based pagination:
+   ```yaml
+   # Query params: cursor, limit (default 20, max 100)
+   # Response: data[], nextCursor, hasMore
+   ```
+
+8. **Versioning** — put the version in the URL path (/v1/)
+
+Output the complete openapi.yaml. After the YAML, provide a 5-bullet summary of design decisions made and any ambiguities you resolved.
+```
+
+## Example input → output
+
+**Input:**
+> "I need an API for a task management app. Users can create projects, add tasks to projects, assign tasks to users, and mark tasks done. Third-party developers will call this with API keys."
+
+**Output:** A complete 200+ line OpenAPI spec with `/v1/projects`, `/v1/projects/{id}/tasks`, `/v1/tasks/{id}`, `/v1/users` endpoints, full CRUD, API key auth, pagination on list endpoints, and a proper error schema.
+
+## Validate the output
+
+```bash
+# Install Redocly CLI
+npm install -g @redocly/cli
+
+# Lint the generated spec
+redocly lint openapi.yaml
+
+# Preview the docs
+redocly preview-docs openapi.yaml
+```
+
+## Generate client SDKs from the spec
+
+```bash
+# TypeScript client
+npx openapi-typescript openapi.yaml -o src/types/api.ts
+
+# Generate a full SDK (fetch-based)
+npx openapi-fetch --input openapi.yaml --output src/api-client
+```
+
+## Tips
+
+- The more context you give (data models, caller types, business rules), the better the spec
+- Always review the generated `required` arrays — Claude tends to be conservative
+- Use the "ambiguities resolved" section at the end to catch assumptions you disagree with
+- Commit `openapi.yaml` to the repo and add `redocly lint` to CI

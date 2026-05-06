@@ -1,0 +1,125 @@
+---
+name: PR Description Writer
+description: >
+  Paste your git diff and get a structured pull request description that
+  explains the why, not just the what. Includes a test plan, risk flags, and
+  reviewer callouts. Makes your PRs easier to review and faster to ship.
+installCommand: git diff main...HEAD | pbcopy
+---
+
+# PR Description Writer
+
+Paste your `git diff` and get a professional PR description that actually helps reviewers understand the change. Covers the motivation, what changed, how to test it, and what to watch for.
+
+## Prompt
+
+```
+You are a senior engineer writing a pull request description for a code review. Your goal is to make the reviewer's job as easy as possible.
+
+Git diff / changes summary:
+[PASTE YOUR GIT DIFF OR DESCRIBE YOUR CHANGES HERE]
+
+Ticket/issue context (optional):
+[LINK OR DESCRIPTION OF THE ISSUE BEING SOLVED]
+
+Write a PR description using this exact format:
+
+---
+
+## Summary
+
+[1–3 sentence executive summary: what this PR does and why it exists. Write this for someone who won't read the rest of the description.]
+
+## Motivation
+
+[Why was this change needed? Link to the bug report, user complaint, or business requirement. If it's a refactor, explain what pain it eliminates.]
+
+## What changed
+
+[Use bullet points. Each bullet should be one logical change. Be specific — name the files, functions, or components affected. Do NOT just list file names; explain what changed about them.]
+
+- **[Component/File]:** [what changed and why]
+- **[Component/File]:** [what changed and why]
+
+## How to test
+
+[Step-by-step test plan. Be specific enough that a reviewer unfamiliar with this feature can verify it works.]
+
+1. [Setup step if needed]
+2. [Do X]
+3. [Verify Y appears / Z happens]
+4. [Edge case to check]
+
+**Automated tests:** [List new tests added, or explain why no new tests were needed]
+
+## Screenshots / recordings
+
+[Note if UI changed: "see screenshots below" or "no visual changes". Leave this section if there are no visual changes.]
+
+## Risk and rollback
+
+**Risk level:** [Low / Medium / High] — [one sentence explanation]
+
+**Rollback plan:** [How to undo this if it causes issues in production]
+
+**Feature flag:** [Yes/No — if yes, what flag and how to disable]
+
+## Reviewer notes
+
+[Anything specific you want reviewers to look at closely, design decisions you made that they might question, or things you deliberately did NOT change and why.]
+
+---
+
+After the PR description, add a separate section:
+
+## Review checklist (for the author)
+
+Go through the diff and flag:
+- [ ] Any hardcoded values that should be config
+- [ ] Any missing error handling
+- [ ] Any new dependencies added (and why they were chosen over alternatives)
+- [ ] Any backward-incompatible changes (API, database schema, config format)
+- [ ] Performance implications (N+1 queries, unnecessary re-renders, blocking calls)
+- [ ] Security considerations (user input, authentication, authorization)
+```
+
+## Git commands to generate the diff
+
+```bash
+# Full diff against main branch
+git diff main...HEAD
+
+# Summary of files changed (good for large PRs)
+git diff --stat main...HEAD
+
+# Just the commit messages (for context)
+git log --oneline main...HEAD
+
+# Combine for full context
+echo "=== Commits ===" && git log --oneline main...HEAD && echo "" && echo "=== Diff ===" && git diff main...HEAD
+```
+
+## Tips
+
+- For large PRs (>500 lines), paste only the `--stat` summary and describe the changes — the prompt works with summaries too
+- The "Reviewer notes" section is the most valuable part — use it to pre-answer the questions reviewers will ask
+- If you have a Jira/Linear ticket number, always link it — it gives reviewers the business context that makes code decisions obvious
+- Run the review checklist yourself before requesting review; it catches ~60% of common review comments before they're made
+
+## Variations
+
+### Minimal mode (for small PRs)
+
+```
+Write a concise PR description for this change. Include: what changed (2–3 bullets), why, and how to test it (2–3 steps). Keep it under 200 words.
+
+Diff: [paste diff]
+```
+
+### Security review focus
+
+```
+Write a PR description for this change with a security-focused review section. Highlight: what user input is processed, what auth checks exist, what data is stored or transmitted, and what attack vectors this change opens or closes.
+
+Diff: [paste diff]
+```

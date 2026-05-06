@@ -1,0 +1,98 @@
+---
+name: SQL Query Optimizer
+description: >
+  Paste a slow SQL query and get back a production-ready optimized version with
+  index recommendations, execution plan analysis, and a plain-English
+  explanation of every change. Works with PostgreSQL, MySQL, and SQLite.
+installCommand: psql $DATABASE_URL -c "EXPLAIN ANALYZE <your-query>" | pbcopy
+---
+
+# SQL Query Optimizer
+
+Paste a slow or complex SQL query and get back an optimized version with index recommendations, rewrite rationale, and execution plan guidance.
+
+## Prompt
+
+```
+You are a database performance expert. Optimize the SQL query below.
+
+Database: [PostgreSQL / MySQL / SQLite — specify which]
+Table sizes (approximate row counts if known): [optional]
+Current execution time: [optional]
+Indexes that already exist: [optional, paste CREATE INDEX statements]
+
+Query to optimize:
+```sql
+[PASTE YOUR QUERY HERE]
+```
+
+Provide:
+
+1. **Optimized query** — a drop-in replacement that produces identical results. Preserve the original query's semantics exactly.
+
+2. **Index recommendations** — for each recommended index, provide the exact CREATE INDEX statement and explain which part of the query it serves:
+   ```sql
+   CREATE INDEX CONCURRENTLY idx_orders_user_created
+     ON orders (user_id, created_at DESC)
+     WHERE status = 'active';
+   ```
+
+3. **Rewrite rationale** — for each change you made, explain:
+   - What the original was doing
+   - Why it was slow (full table scan, N+1, missing index, bad join order, etc.)
+   - What the fix does differently
+
+4. **Execution plan guidance** — describe what the EXPLAIN output should look like after optimization:
+   - Which nodes should change (Seq Scan → Index Scan, Hash Join → Nested Loop, etc.)
+   - What cost estimates to expect
+   - Any remaining bottlenecks to investigate
+
+5. **Caveats** — flag any assumptions you made about data distribution, cardinality, or schema that could change the recommendation.
+
+Rules:
+- Never change query semantics. An optimization that returns different rows is not an optimization.
+- Prefer partial indexes and covering indexes over wide composite indexes.
+- For PostgreSQL: use CONCURRENTLY for index creation in production.
+- If the query cannot be significantly optimized as written, say so and suggest a schema change instead.
+```
+
+## Common patterns this catches
+
+| Pattern | Fix |
+|---|---|
+| `SELECT *` on large tables | Select only needed columns |
+| `WHERE LOWER(col) = ?` | Functional index on `LOWER(col)` |
+| Correlated subqueries | Rewrite as JOIN or lateral |
+| `NOT IN (subquery)` | `NOT EXISTS` or `LEFT JOIN WHERE NULL` |
+| `OFFSET` pagination on large tables | Keyset pagination |
+| `ORDER BY` without supporting index | Index on sort column |
+| Multiple single-column indexes | Composite covering index |
+| `COUNT(*)` on filtered large table | Partial index with count estimate |
+
+## Usage tips
+
+### Include schema context
+
+The more context you give, the better the recommendations:
+
+```sql
+-- Paste this before your query
+-- Schema:
+-- users(id, email, created_at, status)  ~2M rows
+-- orders(id, user_id, total, status, created_at)  ~50M rows
+-- Existing indexes: users(email), orders(user_id)
+```
+
+### For PostgreSQL — capture real execution plans
+
+```bash
+# Get EXPLAIN ANALYZE output to paste alongside the query
+psql $DATABASE_URL << 'SQL'
+EXPLAIN (ANALYZE, BUFFERS, FORMAT TEXT)
+  [your query here];
+SQL
+```
+
+### Verify before deploying
+
+Always run the optimized query against a production snapshot with `EXPLAIN ANALYZE` to confirm the expected index scans appear before deploying index changes.

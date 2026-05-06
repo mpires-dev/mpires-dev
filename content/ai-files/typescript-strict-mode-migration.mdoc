@@ -1,0 +1,98 @@
+---
+name: TypeScript Strict Mode Migration
+description: >
+  Migrates a TypeScript codebase to strict mode file by file. Finds every
+  implicit any, unsafe cast, and missing null check — then rewrites them with
+  proper types. Produces a zero-regression PR you can actually ship.
+installCommand: tsc --noEmit --strict 2>&1 | pbcopy
+---
+
+# TypeScript Strict Mode Migration
+
+A structured prompt for migrating any TypeScript project to `"strict": true` without breaking the build or introducing regressions. Works file by file so you can land the change incrementally.
+
+## Why strict mode matters
+
+Strict mode catches entire classes of bugs at compile time:
+
+- `strictNullChecks` — eliminates `undefined is not a function` at runtime
+- `noImplicitAny` — forces explicit typing on all function parameters
+- `strictFunctionTypes` — prevents unsafe callback substitutions
+- `strictPropertyInitialization` — ensures class fields are always initialized
+
+## Prompt
+
+```
+You are a TypeScript expert migrating this file to TypeScript strict mode.
+
+Context:
+- tsconfig.json currently has "strict": false (or is missing strict flags)
+- Our goal is to add "strict": true to tsconfig.json without any build errors
+- We are doing this file by file; do not change other files
+
+Your task for THIS FILE:
+1. Identify every error that would occur under strict mode (run mentally with strictNullChecks, noImplicitAny, strictFunctionTypes, strictPropertyInitialization)
+2. Fix each error using the MINIMAL correct type change:
+   - Add explicit types to function parameters (never use `any` — use `unknown` and narrow, or find the real type)
+   - Add null/undefined checks where values may be absent (use optional chaining ?. or early returns, not non-null assertions !)
+   - Fix class property initialization (assign in constructor or use definite assignment assertion only when genuinely guaranteed)
+   - Replace unsafe casts (as any, as unknown as X) with proper type guards
+3. Do NOT:
+   - Suppress errors with @ts-ignore or @ts-expect-error
+   - Use `any` as a shortcut
+   - Change runtime behavior (no logic changes, only type annotations)
+   - Add unnecessary null checks for values that can never be null
+4. After fixing, explain each change in a comment block at the top of the file:
+   - What errors existed
+   - Why you chose each fix
+   - Any types you inferred vs types you added
+
+Output the full corrected file.
+```
+
+## Migration workflow
+
+### Step 1 — Enable strict in tsconfig without breaking the build
+
+```json
+// tsconfig.json — add flags one at a time to control blast radius
+{
+  "compilerOptions": {
+    "strictNullChecks": true,       // start here — highest value
+    "noImplicitAny": true,          // next
+    "strictFunctionTypes": true,
+    "strictPropertyInitialization": true
+  }
+}
+```
+
+### Step 2 — Get the error list
+
+```bash
+tsc --noEmit --strict 2>&1 | tee strict-errors.txt
+# Count errors by file
+grep "error TS" strict-errors.txt | sed 's/(.*$//' | sort | uniq -c | sort -rn | head -20
+```
+
+### Step 3 — Migrate highest-error files first
+
+Paste each file into Claude with the prompt above. Start with utility/shared files since fixing them often resolves downstream errors.
+
+### Step 4 — Verify no regressions
+
+```bash
+# After each file
+tsc --noEmit
+npm test
+```
+
+### Step 5 — Flip the flag
+
+Once all errors are resolved, replace the individual flags with `"strict": true`.
+
+## Tips
+
+- Do files in dependency order: utils → types → services → components
+- `strictNullChecks` alone catches ~80% of the runtime bugs strict mode prevents
+- If a file has >50 errors, split it — ask Claude to handle one class of error at a time
+- Use `// @ts-strict-ignore` (TypeScript 5.5+) as a last resort escape hatch for files you cannot migrate yet

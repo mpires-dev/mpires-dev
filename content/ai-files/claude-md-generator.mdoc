@@ -1,0 +1,99 @@
+---
+name: CLAUDE.md Generator
+description: >
+  Auto-generates a production-grade CLAUDE.md for any codebase. Drop this
+  prompt into Claude and get a complete project intelligence file with
+  architecture, dev commands, conventions, and gotchas in one pass.
+repoLink: https://github.com/anthropics/claude-code
+installCommand: claude "$(cat .claude/prompts/generate-claude-md.txt)"
+---
+
+# CLAUDE.md Generator
+
+A prompt that analyzes your repository and writes a comprehensive `CLAUDE.md` — the project intelligence file that makes Claude Code dramatically more useful on any codebase.
+
+## What it produces
+
+- Architecture summary and module map
+- All dev commands (install, dev, test, build, lint, deploy)
+- Code style conventions extracted from the actual codebase
+- Known gotchas, footguns, and non-obvious constraints
+- Environment variable inventory
+- Testing patterns and coverage expectations
+
+## Prompt
+
+Copy this into Claude (or save as `.claude/prompts/generate-claude-md.txt`):
+
+```
+You are a senior engineer onboarding yourself to this codebase. Write a CLAUDE.md that makes any AI assistant dramatically more effective on this repo.
+
+Analyze the entire repository and write CLAUDE.md with these sections:
+
+## Project Overview
+One paragraph: what this system does, who uses it, and what problem it solves.
+
+## Architecture
+- List major modules/packages and their responsibilities (one line each)
+- Describe the data flow in plain English (e.g., "Request → middleware → handler → service → DB")
+- Note any monorepo structure, workspaces, or unusual directory layout
+
+## Dev Commands
+Every command needed to work on this repo, as copyable shell commands with one-line descriptions:
+- Install dependencies
+- Start dev server / watch mode
+- Run tests (unit, integration, e2e if they exist separately)
+- Lint and type-check
+- Build for production
+- Deploy (if applicable)
+
+## Code Conventions
+Extract the actual conventions used in this codebase (not generic best practices):
+- Naming: files, components, functions, types/interfaces, constants
+- Import style: absolute vs relative, barrel files, path aliases
+- Error handling pattern
+- Async style: async/await vs promises vs callbacks
+- Testing: test file location, naming convention, what gets mocked
+
+## Environment Variables
+List all env vars the app reads. For each: name, required/optional, default value, and what it controls.
+Check .env.example, config files, and all process.env references.
+
+## Key Files
+The 5–10 files most important for a newcomer to read first, with one-sentence explanations.
+
+## Gotchas and Non-Obvious Constraints
+Things that will bite a developer who doesn't know the codebase:
+- Performance footguns
+- Files that must be updated together
+- External service dependencies in development
+- Any "do not touch" areas with explanations
+
+## Out of Scope
+What is explicitly NOT this repo's responsibility.
+
+Rules:
+- Be specific. Never write "follow best practices" — extract the actual pattern from the code.
+- If you cannot find evidence of something, write "No evidence found — use project default."
+- Keep bullets under 100 characters.
+```
+
+## Usage
+
+```bash
+# Save the prompt
+mkdir -p .claude/prompts
+nano .claude/prompts/generate-claude-md.txt  # paste prompt above
+
+# Generate CLAUDE.md
+claude "$(cat .claude/prompts/generate-claude-md.txt)" > CLAUDE.md
+```
+
+Or paste the prompt directly in an interactive Claude Code session — Claude will read your files and produce the output inline.
+
+## Tips
+
+- Run after initial project setup is stable, not on day one
+- Commit the generated file and let the team iterate on it
+- The "Gotchas" section is highest-value — review it manually
+- Add a `## Current Focus` section by hand after generation to capture sprint context
