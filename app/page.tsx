@@ -5,6 +5,7 @@ import { AiFileCard } from "./components/AiFileCard";
 import { ArrowRight, Download } from "lucide-react";
 import Dither from "./components/Dither";
 import { CareerTimeline } from "./components/CareerTimeline";
+import { TypewriterText } from "./components/TypewriterText";
 
 export default async function Homepage() {
   const projects = await reader.collections.projects.all();
@@ -50,8 +51,17 @@ export default async function Homepage() {
           </span>
         </div>
         <h1 className="text-3xl font-medium leading-[1.05] tracking-[-0.03em] text-white md:text-5xl z-20">
-          Hi, I&apos;m Matheus Pires 👋 <br /> Fullstack Developer focused on
-          AI-powered digital products.
+          Hi, I&apos;m Matheus Pires 👋
+          <br />
+          <TypewriterText
+            phrases={[
+              "Fullstack Developer",
+              "TypeScript Engineer",
+              "AI Product Builder",
+              "Open Source Contributor",
+            ]}
+            className="text-zinc-300"
+          />
         </h1>
         <p className="max-w-2xl text-lg leading-relaxed text-zinc-300">
           7+ years shipping TypeScript-first products — from food-tech at iFood to cloud infra at Devopness.

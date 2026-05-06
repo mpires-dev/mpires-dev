@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Search } from "lucide-react";
+import { useCommandPaletteContext } from "@/app/contexts/command-palette";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -17,6 +18,7 @@ const navLinks = [
 export function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { setOpen: openPalette } = useCommandPaletteContext();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-white/5">
@@ -62,6 +64,17 @@ export function Navbar() {
               </Link>
             ))}
           </div>
+
+          {/* Cmd+K search trigger */}
+          <button
+            onClick={() => openPalette(true)}
+            className="hidden md:flex items-center gap-2 text-xs text-zinc-500 border border-white/10 rounded-full px-3 py-1.5 hover:border-white/20 hover:text-zinc-300 transition-colors"
+            aria-label="Open command palette"
+          >
+            <Search size={12} />
+            <span>Search</span>
+            <kbd className="font-mono opacity-60">⌘K</kbd>
+          </button>
 
           {/* Mobile hamburger */}
           <button
