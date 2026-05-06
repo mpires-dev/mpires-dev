@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 
 export interface TimelineEntry {
@@ -97,6 +97,103 @@ const companyLogoMap: Record<string, string> = {
   tech4humans: "/logos/tech4humans.svg",
 };
 
+function useIntersectionObserver(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [threshold]);
+
+  return { ref, visible };
+}
+
+function TimelineRow({ entry, index, expanded, onToggle }: {
+  entry: TimelineEntry;
+  index: number;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
+  const { ref, visible } = useIntersectionObserver();
+
+  return (
+    <div
+      ref={ref}
+      className="border-t border-white/10 py-8 md:py-10 last:border-b last:border-white/10 transition-all duration-700 ease-out"
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? "translateY(0)" : "translateY(24px)",
+        transitionDelay: `${index * 60}ms`,
+      }}
+    >
+      <button
+        className="w-full text-left"
+        onClick={onToggle}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-[160px_1fr_auto] gap-4 md:gap-8 items-start">
+          <span className="text-sm font-mono text-zinc-500 tracking-wide">
+            {entry.period}
+          </span>
+
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-1">
+              {companyLogoMap[entry.companySlug] && (
+                <Image
+                  src={companyLogoMap[entry.companySlug]}
+                  alt={entry.company}
+                  width={20}
+                  height={20}
+                  className="rounded opacity-80"
+                />
+              )}
+              <h3 className="text-lg md:text-xl font-heading font-semibold tracking-wide text-white uppercase">
+                {entry.title}
+              </h3>
+            </div>
+            <p className="text-sm text-zinc-400 max-w-xl">
+              {entry.description}
+            </p>
+            {expanded && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {entry.techStack.map((tech) => (
+                  <span
+                    key={tech}
+                    className="text-xs font-mono px-2 py-1 rounded border border-white/10 text-zinc-400"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col items-start md:items-end gap-1">
+            <span className="text-sm font-mono text-zinc-500 tracking-wide">
+              {entry.company}
+            </span>
+            <span className="text-xs text-zinc-600">{entry.location}</span>
+            <span className="text-xs text-zinc-600 mt-1">
+              {expanded ? "▲ less" : "▼ tech stack"}
+            </span>
+          </div>
+        </div>
+      </button>
+    </div>
+  );
+}
+
 export function CareerTimeline() {
   const [expanded, setExpanded] = useState<number | null>(null);
 
@@ -114,63 +211,13 @@ export function CareerTimeline() {
 
       <div className="space-y-0">
         {timelineEntries.map((entry, index) => (
-          <div
+          <TimelineRow
             key={index}
-            className="border-t border-white/10 py-8 md:py-10 last:border-b last:border-white/10"
-          >
-            <button
-              className="w-full text-left"
-              onClick={() => setExpanded(expanded === index ? null : index)}
-            >
-              <div className="grid grid-cols-1 md:grid-cols-[160px_1fr_auto] gap-4 md:gap-8 items-start">
-                <span className="text-sm font-mono text-zinc-500 tracking-wide">
-                  {entry.period}
-                </span>
-
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-1">
-                    {companyLogoMap[entry.companySlug] && (
-                      <Image
-                        src={companyLogoMap[entry.companySlug]}
-                        alt={entry.company}
-                        width={20}
-                        height={20}
-                        className="rounded opacity-80"
-                      />
-                    )}
-                    <h3 className="text-lg md:text-xl font-heading font-semibold tracking-wide text-white uppercase">
-                      {entry.title}
-                    </h3>
-                  </div>
-                  <p className="text-sm text-zinc-400 max-w-xl">
-                    {entry.description}
-                  </p>
-                  {expanded === index && (
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {entry.techStack.map((tech) => (
-                        <span
-                          key={tech}
-                          className="text-xs font-mono px-2 py-1 rounded border border-white/10 text-zinc-400"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex flex-col items-start md:items-end gap-1">
-                  <span className="text-sm font-mono text-zinc-500 tracking-wide">
-                    {entry.company}
-                  </span>
-                  <span className="text-xs text-zinc-600">{entry.location}</span>
-                  <span className="text-xs text-zinc-600 mt-1">
-                    {expanded === index ? "▲ less" : "▼ tech stack"}
-                  </span>
-                </div>
-              </div>
-            </button>
-          </div>
+            entry={entry}
+            index={index}
+            expanded={expanded === index}
+            onToggle={() => setExpanded(expanded === index ? null : index)}
+          />
         ))}
       </div>
     </section>

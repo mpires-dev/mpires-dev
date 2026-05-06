@@ -1,9 +1,31 @@
 import React from 'react';
 import Markdoc from '@markdoc/markdoc';
+import type { Metadata } from 'next';
 import { reader } from '../../reader';
 import { markdocConfig } from '../../../keystatic.config';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+
+export async function generateMetadata(props: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await props.params;
+  const post = await reader.collections.posts.read(slug);
+  if (!post) return {};
+  return {
+    title: `${post.title} — Matheus Pires`,
+    description: post.summary ?? undefined,
+    openGraph: {
+      title: post.title,
+      description: post.summary ?? undefined,
+      type: "article",
+      authors: ["Matheus Pires"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.summary ?? undefined,
+    },
+  };
+}
 
 export default async function Post(props: {
   params: Promise<{ slug: string }>;
