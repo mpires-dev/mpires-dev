@@ -1,10 +1,47 @@
+# Dependencies
 node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
 dist/
 build/
 .next/
-.claude
-.agent
-.agents
-.opencode
+out/
+
+# Environment variables
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# TypeScript
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+# AI / Agent tooling
+.claude/
+.agent/
+.agents/
+.opencode/
 skills-lock.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Misc
+.vercel

@@ -1,10 +1,14 @@
 import Link from "next/link";
 import { reader } from "./reader";
 import { ProjectCard } from "./components/ProjectCard";
+import { AiFileCard } from "./components/AiFileCard";
 import { ArrowRight } from "lucide-react";
 import Dither from "./components/Dither";
+import { CareerTimeline } from "./components/CareerTimeline";
 export default async function Homepage() {
   const projects = await reader.collections.projects.all();
+  const aiFiles = await reader.collections.aiFiles.all();
+  const recentAiFiles = aiFiles.slice(0, 3);
   const recentProjects = projects
     .sort((a, b) => {
       const dateA = new Date(a.entry.date || 0).getTime();
@@ -67,9 +71,9 @@ export default async function Homepage() {
           waveSpeed={0.04}
         />
       </div>
-      <div className="max-w-4xl flex flex-col justify-center  relative h-150 gap-3">
+      <div className="max-w-3xl flex flex-col justify-center  relative h-150 gap-3">
         <h1 className="text-3xl font-medium leading-[1.05] tracking-[-0.03em] text-white md:text-5xl z-20">
-          Hi I&apos;m Matheus Pires 👋, a Fullstack Developer focused on
+          Hi I&apos;m Matheus Pires 👋 <br /> a Fullstack Developer focused on
           high-growth digital products.
         </h1>
         <p className="max-w-3xl text-lg leading-relaxed text-zinc-300">
@@ -101,7 +105,7 @@ export default async function Homepage() {
 
       <section className="relative">
         <div className="mb-10 flex items-end justify-between gap-4">
-          <h2 className="text-3xl font-heading font-bold tracking-tight md:text-4xl">
+          <h2 className="text-3xl font-heading font-medium tracking-tight md:text-4xl">
             Case studies
           </h2>
           <Link
@@ -113,7 +117,7 @@ export default async function Homepage() {
         </div>
 
         {recentProjects.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
             {recentProjects.map((project) => (
               <div key={project.slug} className="group relative">
                 <ProjectCard
@@ -148,6 +152,63 @@ export default async function Homepage() {
           </Link>
         </div>
       </section>
+
+      <section className="relative">
+        <div className="mb-10 flex items-end justify-between gap-4">
+          <div>
+            <h2 className="text-3xl font-heading font-medium tracking-tight md:text-4xl">
+              AI Files
+            </h2>
+            <p className="text-zinc-400 mt-2">
+              Open source AI skills, agents and tools — free to use and remix.
+            </p>
+          </div>
+          <Link
+            href="/ai-files"
+            className="hidden items-center gap-2 text-primary transition-colors hover:text-zinc-300 md:flex shrink-0"
+          >
+            View all <ArrowRight size={18} />
+          </Link>
+        </div>
+
+        {recentAiFiles.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {recentAiFiles.map((file) => (
+              <AiFileCard
+                key={file.slug}
+                name={file.entry.name}
+                description={file.entry.description || ""}
+                slug={file.slug}
+                coverImage={file.entry.coverImage || undefined}
+                repoLink={file.entry.repoLink || undefined}
+                installCommand={file.entry.installCommand || undefined}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-white/15 py-20 text-center">
+            <p className="text-4xl mb-3">🤖</p>
+            <p className="text-zinc-400">No AI files published yet.</p>
+            <Link
+              href="/keystatic"
+              className="mt-4 inline-block text-primary hover:underline"
+            >
+              Open content panel
+            </Link>
+          </div>
+        )}
+
+        <div className="mt-8 md:hidden text-center">
+          <Link
+            href="/ai-files"
+            className="inline-flex items-center gap-2 text-primary transition-colors hover:text-zinc-300"
+          >
+            View all <ArrowRight size={18} />
+          </Link>
+        </div>
+      </section>
+
+      <CareerTimeline />
 
       <section className="grid gap-8 md:grid-cols-2">
         <div className="rounded-2xl border border-white/10 bg-[#0b0b0b] p-6">
