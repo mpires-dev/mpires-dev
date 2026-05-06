@@ -3,7 +3,16 @@ import { renderToBuffer, Document, Page, Text, View, StyleSheet, Font } from "@r
 
 Font.register({
   family: "Inter",
-  src: "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2",
+  fonts: [
+    {
+      src: "https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfMZg.ttf",
+      fontWeight: 400,
+    },
+    {
+      src: "https://fonts.gstatic.com/s/inter/v20/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYMZg.ttf",
+      fontWeight: 700,
+    },
+  ],
 });
 
 const styles = StyleSheet.create({
